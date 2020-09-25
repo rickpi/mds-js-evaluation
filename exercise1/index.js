@@ -17,26 +17,30 @@ var GridGenerator = function GridGenerator(xAxis, yAxis) {
     this.body = document.querySelector('body');
     this.xAxis = xAxis;
     this.yAxis = yAxis;
+    this.event = document.createEvent('Event');
 };
 
 /*
  * Style - stylise the app
+ * @return {Object} this
  */
 GridGenerator.prototype._style = function() {
     var sheet = document.createElement('style');
 
     sheet.innerHTML = ':root { --primary-color: #9FD17A; --primary-color-light: #C7FE9F; --primary-color-dark: #8AD058; --white: #FFF; }';
     sheet.innerHTML += 'html, body { padding: 0; margin: 0; box-sizing: border-box; font-size: 16px; }';
-    sheet.innerHTML += 'html { min-width: 100vw; min-height: 100vh; background-image: linear-gradient(90deg, var(--primary-color-light), var(--primary-color-dark)); display: flex; flex-direction: column; }';
-    sheet.innerHTML += '.matrix-container { margin: auto; box-shadow: 0 0.8em 1em rgba(0, 0, 0, 0.65); background-color: var(--white); border-radius: 1em; padding: 2em; }';
+    sheet.innerHTML += 'body { min-width: 100vw; min-height: 100vh; background-image: linear-gradient(90deg, var(--primary-color-light), var(--primary-color-dark)); display: flex; flex-direction: column; }';
+    sheet.innerHTML += '.matrix { margin: auto; box-shadow: 0 0.8em 1em rgba(0, 0, 0, 0.65); background-color: var(--white); border-radius: 1em; padding: 2em; }';
     sheet.innerHTML += '.matrix-cell { width: 1em; height: 1em; text-align: center; }';
 
     this.body.appendChild(sheet);
-    console.log(sheet);
+
+    return this;
 }
 
 /**
  * Init Matrix
+ * @return {Object} this
  */
 GridGenerator.prototype._createMatrix = function() {
     var table = document.createElement('table');
@@ -56,18 +60,65 @@ GridGenerator.prototype._createMatrix = function() {
     }
 
     this.body.appendChild(table);
+    return this;
 }
 
 /**
+ * Bind Event
+ * @return {Object} this
+ */
+GridGenerator.prototype._bindEvent = function() {
+    this.event.initEvent('changeColor', true, true);
+    document.addEventListener('changeColor', this._changeCellsColor);
+
+    return this;
+}
+
+/**
+ * Change Cells Color
+ * @return {Object} this
+ */
+GridGenerator.prototype._changeCellsColor = function() {
+    var cells = document.querySelectorAll('.matrix-cell');
+
+    for (var i = 0; i < cells.length; i++) {      
+        var r = Math.floor(Math.random() * 256);
+        var g = Math.floor(Math.random() * 256);
+        var b = Math.floor(Math.random() * 256);
+
+        cells[i].style.backgroundColor = 'rgb(' + r + ', ' + g + ', ' + b + ')';
+    }
+
+    return this;
+}
+
+/**
+ * Get Random MS - return a value between 1000 and 2000
+ * @return {number} seconds
+ */
+GridGenerator.prototype._getRandomMS = function() {
+    return Math.floor((Math.random() + 1) * 1000);
+};
+
+/**
  * Run
+ * @return {Object} this
  */
 GridGenerator.prototype.run = function() {
+    var event = document.createEvent('Event');
+    console.log(this._getRandomMS());
+
     this._style();
     this._createMatrix();
+    this._bindEvent();
+    setInterval(function() {
+        document.dispatchEvent(this.event)
+    }.bind(this), 1000);
+
+    return this;
 };
 
 /* Test */
-var matrixGen = new GridGenerator(10, 10);
+var matrixGen = new GridGenerator(20, 20);
 matrixGen.run();
-console.log(matrixGen.matrix);
 /* End test */
