@@ -10,14 +10,10 @@
  * @param {number} yAxis
  */
 var GridGenerator = function GridGenerator(xAxis, yAxis) {
-    this.invalid = typeof this.xAxis !== 'number' ||
-                typeof this.yAxis !== 'number' ||
-                this.xAxis <= 0 ||
-                this.yAxis <= 0;
     this.body = document.querySelector('body');
+    this.event = document.createEvent('Event');
     this.xAxis = xAxis;
     this.yAxis = yAxis;
-    this.event = document.createEvent('Event');
 };
 
 /*
@@ -32,9 +28,7 @@ GridGenerator.prototype._style = function() {
     sheet.innerHTML += 'body { min-width: 100vw; min-height: 100vh; background-image: linear-gradient(90deg, var(--primary-color-light), var(--primary-color-dark)); display: flex; flex-direction: column; }';
     sheet.innerHTML += '.matrix { margin: auto; box-shadow: 0 0.8em 1em rgba(0, 0, 0, 0.65); background-color: var(--white); border-radius: 1em; padding: 2em; }';
     sheet.innerHTML += '.matrix-cell { width: 1em; height: 1em; text-align: center; }';
-
     this.body.appendChild(sheet);
-
     return this;
 }
 
@@ -74,28 +68,23 @@ GridGenerator.prototype._bindEvent = function() {
     for (var i = 0; i < cells.length; i++) {
         cells[i].addEventListener('changeColor', function(e) {
             this._changeCellColor(e.target);
-        }.bind(this))
+        }.bind(this));
     }
 
     return this;
 }
 
 /**
- * Change Cell Color
+ * Change Cell Color - change the background color of the cell with random value for r, g and b
  * @param {Object} this
  * @return {Object} this
  */
 GridGenerator.prototype._changeCellColor = function(cell) {
-    /*var cells = document.querySelectorAll('.matrix-cell');
+    var r = Math.floor(Math.random() * 256);
+    var g = Math.floor(Math.random() * 256);
+    var b = Math.floor(Math.random() * 256);
 
-    for (var i = 0; i < cells.length; i++) {*/
-        var r = Math.floor(Math.random() * 256);
-        var g = Math.floor(Math.random() * 256);
-        var b = Math.floor(Math.random() * 256);
-
-        cell.style.backgroundColor = 'rgb(' + r + ', ' + g + ', ' + b + ')';
-    /*}*/
-
+    cell.style.backgroundColor = 'rgb(' + r + ', ' + g + ', ' + b + ')';
     return this;
 }
 
@@ -108,24 +97,63 @@ GridGenerator.prototype._getRandomMS = function() {
 };
 
 /**
- * Run
+ * Animate - trigger event on each cell
  * @return {Object} this
+ */
+GridGenerator.prototype._animate = function() { 
+    var cells = document.querySelectorAll('.matrix-cell');
+
+    for (var i = 0; i < cells.length; i++) {
+        this._triggerEvent(cells[i]);
+    }
+
+    return this;
+}
+
+/**
+ * Trigger Event - trigger event on the cell and setInterval with a random value
+ * @param {Object} cell
+ * @return {Object} this
+ */
+GridGenerator.prototype._triggerEvent = function(cell) {
+    setInterval(function() {
+        cell.dispatchEvent(this.event);
+    }.bind(this), this._getRandomMS());
+    return this;
+}
+
+/**
+ * Check Args - check if the given arguments are correct
+ * @return {boolean} valid
+ */
+ GridGenerator.prototype._checkArgs = function() {
+    return typeof this.xAxis !== 'number' ||
+            typeof this.yAxis !== 'number' ||
+            this.xAxis <= 0 ||
+            this.yAxis <= 0;
+ };
+
+/**
+ * Run - run the app
+ * @return {boolean} success
  */
 GridGenerator.prototype.run = function() {
     var event = document.createEvent('Event');
-    console.log(this._getRandomMS());
+
+    try {
+        if (this._checkArgs()) {
+            throw new Error('invalid arguments') ;
+        }
+    } catch (e) {
+        console.error(e);
+        return false;
+    }
 
     this._style();
     this._createMatrix();
     this._bindEvent();
-
-    var cells = document.querySelectorAll('.matrix-cell');
-
-    setInterval(function() {
-        cells[0].dispatchEvent(this.event)
-    }.bind(this), 500);
-
-    return this;
+    this._animate();
+    return true;
 };
 
 /* Test */
