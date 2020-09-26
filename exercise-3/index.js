@@ -8,9 +8,9 @@
  * @constructor
  */
 var MyMorpionXO = function MyMorpionXO() {
-	this.xPoints = 0;
-	this.oPoints = 0;
-	this.whosPlaying = 'X';
+	this.scoreX;
+	this.scoreO;
+	this.whosPlaying;
 };
 
 /**
@@ -93,12 +93,37 @@ MyMorpionXO.prototype._createComponents = function() {
 };
 
 /**
+ * Init Game
+ * @return {Object} this
+ */
+MyMorpionXO.prototype._initGame = function() {
+	var scoreO = document.querySelector('#scoreO');
+	var scoreX = document.querySelector('#scoreX');
+	var playerTurn = document.querySelector('#playerTurn');
+	var board = document.querySelector('#board');
+	var cells = board.children;
+
+	this.whosPlaying = Math.floor(Math.random() * 2);
+	this.scoreX = 0;
+	this.scoreO = 0;
+	scoreO.textContent = this.scoreO;
+	scoreX.textContent = this.scoreX;
+	playerTurn.textContent = this.whosPlaying ? 'O' : 'X';
+	for (var i = 0; i < cells.length; i++) {
+		cells[i].textContent = ' ';
+	}
+
+	return this;
+};
+
+/**
  * Run
  * @return {Object} this
  */
 MyMorpionXO.prototype.run = function() {
 	this._style();
 	this._createComponents();
+	this._initGame();
 	return this;
 };
 
