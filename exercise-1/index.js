@@ -33,7 +33,7 @@ GridGenerator.prototype._style = function() {
 }
 
 /**
- * Init Matrix
+ * Init Matrix - create a <table> with xAxis <td> and yAxis <ty>
  * @return {Object} this
  */
 GridGenerator.prototype._createMatrix = function() {
@@ -58,7 +58,7 @@ GridGenerator.prototype._createMatrix = function() {
 }
 
 /**
- * Bind Event
+ * Bind Event - make each cell listening the event
  * @return {Object} this
  */
 GridGenerator.prototype._bindEvent = function() {
