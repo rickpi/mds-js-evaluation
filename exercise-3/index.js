@@ -192,6 +192,16 @@ MyMorpionXO.prototype._isThereAWinner = function() {
 };
 
 /**
+ * Render Who's Playing
+ * @return {Object} this
+ */
+MyMorpionXO.prototype._renderWhosPlaying = function() {
+	var playerTurn = document.querySelector('#playerTurn');
+
+	playerTurn.textContent = this.whosPlaying ? 'O' : 'X';
+};
+
+/**
  * Bind Events
  * @return {Object} this
  */
@@ -207,6 +217,7 @@ MyMorpionXO.prototype._bindEvents = function() {
 				return ;
 			}
 			this.whosPlaying = this.whosPlaying ? 0 : 1;
+			this._renderWhosPlaying();
 		}.bind(this));
 	}
 
