@@ -54,6 +54,17 @@ DrawBar.prototype.changeColor = function(newColor) {
 };
 
 /**
+ * Change Percent
+ * @param {number} newPercent
+ * @return {Object} this
+ */
+DrawBar.prototype.changePercent = function(newPercent) {
+	this.percent = newPercent;
+
+	return this;
+};
+
+/**
  * Run
  * @return {Object} bar
  */
@@ -64,7 +75,7 @@ DrawBar.prototype.run = function() {
 };
 
 /* Test */
-var drawBar = new DrawBar(50, 20);
+var drawBar = new DrawBar(100, 20);
 var container = document.createElement('div');
 var sheet = document.createElement('style');
 var loadingBar = drawBar.run();
@@ -78,4 +89,5 @@ container.classList.add('container');
 document.body.appendChild(container);
 container.appendChild(loadingBar);
 drawBar.changeColor('#e55039');
+drawBar.changePercent(drawBar.percent + 10);
 /* End test */
