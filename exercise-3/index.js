@@ -11,6 +11,7 @@ var MyMorpionXO = function MyMorpionXO() {
 	this.scoreX;
 	this.scoreO;
 	this.whosPlaying;
+	this.isPlaying;
 };
 
 /**
@@ -93,6 +94,22 @@ MyMorpionXO.prototype._createComponents = function() {
 };
 
 /**
+ * Bind Events
+ * @return {Object} this
+ */
+MyMorpionXO.prototype._bindEvents = function() {
+	var board = document.querySelector('#board');
+	var cells = board.children;
+
+	for (var i = 0; i < cells.length; i++) {
+		cells[i].addEventListener('click', function(e) {
+			e.target.textContent = this.whosPlaying ? 'O' : 'X';
+			this.whosPlaying = this.whosPlaying ? 0 : 1;
+		}.bind(this));
+	}
+};
+
+/**
  * Init Game
  * @return {Object} this
  */
@@ -106,6 +123,7 @@ MyMorpionXO.prototype._initGame = function() {
 	this.whosPlaying = Math.floor(Math.random() * 2);
 	this.scoreX = 0;
 	this.scoreO = 0;
+	this.isPlaying = true;
 	scoreO.textContent = this.scoreO;
 	scoreX.textContent = this.scoreX;
 	playerTurn.textContent = this.whosPlaying ? 'O' : 'X';
@@ -123,6 +141,7 @@ MyMorpionXO.prototype._initGame = function() {
 MyMorpionXO.prototype.run = function() {
 	this._style();
 	this._createComponents();
+	this._bindEvents();
 	this._initGame();
 	return this;
 };
