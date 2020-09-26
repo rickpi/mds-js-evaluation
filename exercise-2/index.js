@@ -65,6 +65,18 @@ DrawBar.prototype.changePercent = function(newPercent) {
 };
 
 /**
+ * Update
+ * @return {Object} loadingBar - the updated bar
+ */
+DrawBar.prototype.update = function() {
+	var segment = this.loadingBar.firstChild;
+
+	segment.style.width = this._calculatePercent() + '%';
+	segment.style.backgroundColor = this.color;
+	return this.loadingBar;
+};
+
+/**
  * Run
  * @return {Object} bar
  */
@@ -90,4 +102,5 @@ document.body.appendChild(container);
 container.appendChild(loadingBar);
 drawBar.changeColor('#e55039');
 drawBar.changePercent(drawBar.percent + 10);
+drawBar.update();
 /* End test */
