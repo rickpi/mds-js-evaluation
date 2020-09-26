@@ -202,18 +202,43 @@ MyMorpionXO.prototype._renderWhosPlaying = function() {
 };
 
 /**
+ * Refresh Game
+ * @return {Object} this
+ */
+MyMorpionXO.prototype._refreshGame = function() {
+	var scoreO = document.querySelector('#scoreO');
+	var scoreX = document.querySelector('#scoreX');
+	var playerTurn = document.querySelector('#playerTurn');
+	var board = document.querySelector('#board');
+	var cells = board.children;
+
+	scoreO.textContent = this.scoreO;
+	scoreX.textContent = this.scoreX;
+	playerTurn.textContent = this.whosPlaying ? 'O' : 'X';
+	for (var i = 0; i < cells.length; i++) {
+		cells[i].textContent = ' ';
+	}
+};
+
+/**
  * Bind Events
  * @return {Object} this
  */
 MyMorpionXO.prototype._bindEvents = function() {
 	var board = document.querySelector('#board');
 	var cells = board.children;
+	var winnerEvent = document.createEvent('Event');
 
+	winnerEvent.initEvent('winner', true, true);
+	board.addEventListener('winner', function () {
+		this._refreshGame();
+	}.bind(this));
 	for (var i = 0; i < cells.length; i++) {
 		cells[i].addEventListener('click', function(e) {
 			e.target.textContent = this.whosPlaying ? 'O' : 'X';
 			if (this._isThereAWinner()) {
 				this.winner ? this.scoreO++ : this.scoreX++;
+				board.dispatchEvent(winnerEvent);
 				return ;
 			}
 			this.whosPlaying = this.whosPlaying ? 0 : 1;
