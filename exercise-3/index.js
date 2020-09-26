@@ -221,28 +221,42 @@ MyMorpionXO.prototype._refreshGame = function() {
 };
 
 /**
+ * Handle Click On Cell
+ * @param {Object} cell
+ * @param {Object} winnerEvent
+ * @return {Object} this
+ */
+MyMorpionXO.prototype._handleClickOnCell = function(cell) {
+	var winnerEvent = document.createEvent('Event');
+
+	winnerEvent.initEvent('winner', true, true);
+	if (cell.textContent === ' ') {
+		cell.textContent = this.whosPlaying ? 'O' : 'X';
+		if (this._isThereAWinner()) {
+			this.winner ? this.scoreO++ : this.scoreX++;
+			board.dispatchEvent(winnerEvent);
+			return ;
+		}
+
+		this.whosPlaying = this.whosPlaying ? 0 : 1;
+		this._renderWhosPlaying();
+	}
+};
+
+/**
  * Bind Events
  * @return {Object} this
  */
 MyMorpionXO.prototype._bindEvents = function() {
 	var board = document.querySelector('#board');
 	var cells = board.children;
-	var winnerEvent = document.createEvent('Event');
 
-	winnerEvent.initEvent('winner', true, true);
 	board.addEventListener('winner', function () {
 		this._refreshGame();
 	}.bind(this));
 	for (var i = 0; i < cells.length; i++) {
 		cells[i].addEventListener('click', function(e) {
-			e.target.textContent = this.whosPlaying ? 'O' : 'X';
-			if (this._isThereAWinner()) {
-				this.winner ? this.scoreO++ : this.scoreX++;
-				board.dispatchEvent(winnerEvent);
-				return ;
-			}
-			this.whosPlaying = this.whosPlaying ? 0 : 1;
-			this._renderWhosPlaying();
+			this._handleClickOnCell(e.target);
 		}.bind(this));
 	}
 
