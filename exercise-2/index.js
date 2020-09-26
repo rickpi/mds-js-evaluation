@@ -86,21 +86,46 @@ DrawBar.prototype.run = function() {
 	return bar;
 };
 
-/* Test */
-var drawBar = new DrawBar(100, 20);
-var container = document.createElement('div');
-var sheet = document.createElement('style');
-var loadingBar = drawBar.run();
+/**
+ * Testing
+ */
+function testing() {
+	var container = document.createElement('div');
+	var drawBar = new DrawBar(100, 0);
+	var event = document.createEvent('Event');
+	var loadingBar = drawBar.run();
+	var sheet = document.createElement('style');
 
-sheet.innerHTML = ':root { --primary-color: #9FD17A; --primary-color-light: #C7FE9F; --primary-color-dark: #8AD058; --grey: #EEE; }';
-sheet.innerHTML += 'html, body { padding: 0; margin: 0; box-sizing: border-box; font-size: 16px; }';
-sheet.innerHTML += 'body { min-width: 100vw; min-height: 100vh; background-image: linear-gradient(90deg, var(--primary-color-light), var(--primary-color-dark)); display: flex; flex-direction: column; }';
-sheet.innerHTML += '.container { margin: auto; width: 30em; height: 2em; box-shadow: 0 0.8em 1em rgba(0, 0, 0, 0.65); background-color: var(--grey); border-radius: 0.6em; overflow: hidden; }';
-document.body.appendChild(sheet);
-container.classList.add('container');
-document.body.appendChild(container);
-container.appendChild(loadingBar);
-drawBar.changeColor('#e55039');
-drawBar.changePercent(drawBar.percent + 10);
-drawBar.update();
-/* End test */
+	sheet.innerHTML = ':root { --primary-color: #9FD17A; --primary-color-light: #C7FE9F; --primary-color-dark: #8AD058; --grey: #EEE; }';
+	sheet.innerHTML += 'html, body { padding: 0; margin: 0; box-sizing: border-box; font-size: 16px; }';
+	sheet.innerHTML += 'body { min-width: 100vw; min-height: 100vh; background-image: linear-gradient(90deg, var(--primary-color-light), var(--primary-color-dark)); display: flex; flex-direction: column; }';
+	sheet.innerHTML += '.container { margin: auto; width: 30em; height: 2em; box-shadow: 0 0.8em 1em rgba(0, 0, 0, 0.65); background-color: var(--grey); border-radius: 0.6em; overflow: hidden; }';
+	document.body.appendChild(sheet);
+	container.classList.add('container');
+	document.body.appendChild(container);
+	container.appendChild(loadingBar);
+
+	event.initEvent('stopLoading', true, true);
+	var loading = setInterval(function() {
+		drawBar.changePercent(drawBar.percent + 5);
+		if (drawBar.percent >= 75) {
+			drawBar.changeColor('#f6b93b');
+		}
+
+		if (drawBar.percent >= 95) {
+			drawBar.changeColor('#e55039');
+		}
+
+		drawBar.update();
+		if (drawBar.percent === drawBar.sum) {
+			loadingBar.dispatchEvent(event);
+		}
+
+	}, 500);
+
+	loadingBar.addEventListener('stopLoading', function() {
+		clearInterval(loading);
+	});
+}
+
+testing();
