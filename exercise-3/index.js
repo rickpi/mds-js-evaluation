@@ -11,7 +11,7 @@ var MyMorpionXO = function MyMorpionXO() {
 	this.scoreX;
 	this.scoreO;
 	this.whosPlaying;
-	this.isPlaying;
+	this.winner;
 };
 
 /**
@@ -94,6 +94,104 @@ MyMorpionXO.prototype._createComponents = function() {
 };
 
 /**
+ * Check Rows
+ * @param {Object[]} cells
+ * @return {boolean} winner
+ */
+MyMorpionXO.prototype._checkRows = function(cells) {
+	if (cells[0].textContent === cells[1].textContent &&
+		cells[0].textContent === cells[2].textContent &&
+		cells[0].textContent !== ' ') {
+		this.winner = cells[0].textContent === 'X' ? 0 : 1;
+		return true;
+	}
+
+	if (cells[3].textContent === cells[4].textContent &&
+		cells[3].textContent === cells[5].textContent &&
+		cells[3].textContent !== ' ') {
+		this.winner = cells[3].textContent === 'X' ? 0 : 1;
+		return true;
+	}
+
+	if (cells[6].textContent === cells[7].textContent &&
+		cells[6].textContent === cells[8].textContent &&
+		cells[6].textContent !== ' ') {
+		this.winner = cells[6].textContent === 'X' ? 0 : 1;
+		return true;
+	}
+
+	return false;
+};
+
+/**
+ * Check Cols
+ * @param {Object[]} cells
+ * @return {boolean} winner
+ */
+MyMorpionXO.prototype._checkCols = function(cells) {
+	if (cells[0].textContent === cells[3].textContent &&
+		cells[0].textContent === cells[6].textContent &&
+		cells[0].textContent !== ' ') {
+		this.winner = cells[0].textContent === 'X' ? 0 : 1;
+		return true;
+	}
+
+	if (cells[1].textContent === cells[4].textContent &&
+		cells[1].textContent === cells[7].textContent &&
+		cells[1].textContent !== ' ') {
+		this.winner = cells[1].textContent === 'X' ? 0 : 1;
+		return true;
+	}
+
+	if (cells[2].textContent === cells[5].textContent &&
+		cells[2].textContent === cells[8].textContent &&
+		cells[2].textContent !== ' ') {
+		this.winner = cells[2].textContent === 'X' ? 0 : 1;
+		return true;
+	}
+
+	return false;
+};
+
+/**
+ * Check Cols
+ * @param {Object[]} cells
+ * @return {boolean} winner
+ */
+MyMorpionXO.prototype._checkDiags = function(cells) {
+	if (cells[0].textContent === cells[4].textContent &&
+		cells[0].textContent === cells[8].textContent &&
+		cells[0].textContent !== ' ') {
+		this.winner = cells[0].textContent === 'X' ? 0 : 1;
+		return true;
+	}
+
+	if (cells[2].textContent === cells[4].textContent &&
+		cells[2].textContent === cells[6].textContent &&
+		cells[2].textContent !== ' ') {
+		this.winner = cells[2].textContent === 'X' ? 0 : 1;
+		return true;
+	}
+
+	return false;
+};
+
+/**
+ * Is There A Winner
+ * @return {boolean} winner
+ */
+MyMorpionXO.prototype._isThereAWinner = function() {
+	var board = document.querySelector('#board');
+	var cells = board.children;
+	var winner = false;
+
+	winner = this._checkRows(cells);
+	winner = winner ? true : this._checkCols(cells);
+	winner = winner ? true :this._checkDiags(cells);
+	return winner;
+};
+
+/**
  * Bind Events
  * @return {Object} this
  */
@@ -104,9 +202,15 @@ MyMorpionXO.prototype._bindEvents = function() {
 	for (var i = 0; i < cells.length; i++) {
 		cells[i].addEventListener('click', function(e) {
 			e.target.textContent = this.whosPlaying ? 'O' : 'X';
+			if (this._isThereAWinner()) {
+				this.winner ? this.scoreO++ : this.scoreX++;
+				return ;
+			}
 			this.whosPlaying = this.whosPlaying ? 0 : 1;
 		}.bind(this));
 	}
+
+	return this;
 };
 
 /**
@@ -123,7 +227,7 @@ MyMorpionXO.prototype._initGame = function() {
 	this.whosPlaying = Math.floor(Math.random() * 2);
 	this.scoreX = 0;
 	this.scoreO = 0;
-	this.isPlaying = true;
+	this.winner = -1;
 	scoreO.textContent = this.scoreO;
 	scoreX.textContent = this.scoreX;
 	playerTurn.textContent = this.whosPlaying ? 'O' : 'X';
