@@ -43,6 +43,17 @@ DrawBar.prototype._createBar = function() {
 };
 
 /**
+ * Change Color
+ * @param {string} newColor
+ * @return {Object} this
+ */
+DrawBar.prototype.changeColor = function(newColor) {
+	this.color = newColor;
+
+	return this;
+};
+
+/**
  * Run
  * @return {Object} bar
  */
@@ -66,4 +77,5 @@ document.body.appendChild(sheet);
 container.classList.add('container');
 document.body.appendChild(container);
 container.appendChild(loadingBar);
+drawBar.changeColor('#e55039');
 /* End test */
