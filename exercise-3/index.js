@@ -27,7 +27,7 @@ MyMorpionXO.prototype._style = function() {
 	document.head.appendChild(fontFamily);
 	sheet.innerHTML = ':root { --primary-color: #9FD17A; --primary-color-light: #C7FE9F; --primary-color-dark: #8AD058; --white: #FFF; --grey: #BBB; }';
 	sheet.innerHTML += 'html, body { padding: 0; margin: 0; box-sizing: border-box; font-size: 16px; font-family: \'Roboto\', sans-serif; }';
-	sheet.innerHTML += 'body { min-width: 100vw; min-height: 100vh; background-image: linear-gradient(90deg, var(--primary-color-light), var(--primary-color-dark)); display: flex; flex-direction: column; }';
+	sheet.innerHTML += 'body { min-width: 100vw; min-height: 100vh; background-image: linear-gradient(90deg, var(--primary-color-light), var(--primary-color-dark)); display: flex; flex-direction: column; position: relative }';
 	sheet.innerHTML += '.container { margin: auto; padding: 1em; box-shadow: 0 0.8em 1em rgba(0, 0, 0, 0.65); background-color: var(--white); border-radius: 0.6em; }';
 	sheet.innerHTML += '.players-part { width: 27em; margin-bottom: 1.5em;}';
 	sheet.innerHTML += '.players { width: 100%; display: flex;	justify-content: space-around; font-size: 1.5em; margin-bottom: 0.5em; }';
@@ -35,6 +35,8 @@ MyMorpionXO.prototype._style = function() {
 	sheet.innerHTML += '.player-turn { font-size: 1.2em; margin: auto; width: fit-content; }';
 	sheet.innerHTML += '.board { margin: 0; padding: 0;	list-style: none; display: grid; height: 24em; column-gap: 0.5em; row-gap: 0.5em; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); }';
 	sheet.innerHTML += '.board-cell { background-color: var(--grey); display: flex;	align-items: center; justify-content: center; font-size: 3.5em;	color: var(--white); }';
+	sheet.innerHTML += '.winner { position: absolute; top: 50%; left: 50%; transform: translateX(-50%) translateY(-50%); background-color: #FFF; z-index: 10;	display: flex; align-items: center;	justify-content: center; text-align: center; font-size: 1.5em; padding: 2em; }';
+	sheet.innerHTML += '.body-cover { position: absolute; width: 100%; height: 100%; left: 0; right: 0; z-index: 5;	background-color: rgba(0, 0, 0, 0.5); content: ""; }';
 	document.head.appendChild(sheet);
 	return this;
 };
@@ -199,25 +201,7 @@ MyMorpionXO.prototype._renderWhosPlaying = function() {
 	var playerTurn = document.querySelector('#playerTurn');
 
 	playerTurn.textContent = this.whosPlaying ? 'O' : 'X';
-};
-
-/**
- * Refresh Game
- * @return {Object} this
- */
-MyMorpionXO.prototype._refreshGame = function() {
-	var scoreO = document.querySelector('#scoreO');
-	var scoreX = document.querySelector('#scoreX');
-	var playerTurn = document.querySelector('#playerTurn');
-	var board = document.querySelector('#board');
-	var cells = board.children;
-
-	scoreO.textContent = this.scoreO;
-	scoreX.textContent = this.scoreX;
-	playerTurn.textContent = this.whosPlaying ? 'O' : 'X';
-	for (var i = 0; i < cells.length; i++) {
-		cells[i].textContent = ' ';
-	}
+	return this;
 };
 
 /**
@@ -241,6 +225,64 @@ MyMorpionXO.prototype._handleClickOnCell = function(cell) {
 		this.whosPlaying = this.whosPlaying ? 0 : 1;
 		this._renderWhosPlaying();
 	}
+
+	return this;
+};
+
+/**
+ * Refresh Game
+ * @return {Object} this
+ */
+MyMorpionXO.prototype._refreshGame = function() {
+	var scoreO = document.querySelector('#scoreO');
+	var scoreX = document.querySelector('#scoreX');
+	var playerTurn = document.querySelector('#playerTurn');
+	var board = document.querySelector('#board');
+	var cells = board.children;
+
+	scoreO.textContent = this.scoreO;
+	scoreX.textContent = this.scoreX;
+	playerTurn.textContent = this.whosPlaying ? 'O' : 'X';
+	for (var i = 0; i < cells.length; i++) {
+		cells[i].textContent = ' ';
+	}
+
+	return this
+};
+
+/**
+ * Is There A Big Winner
+ * @return {Object} this;
+ */
+MyMorpionXO.prototype._isThereABigWinner = function(board) {
+	var bigWinnerEvent = document.createEvent('Event');
+
+	bigWinnerEvent.initEvent('bigWinner', true, true);
+	if (this.scoreX === 3 || this.scoreO === 3) {
+		board.dispatchEvent(bigWinnerEvent);
+
+		return this;
+	}
+
+	this._refreshGame();
+	return this;
+};
+
+/**
+ * Ending Game
+ * @return {Object this}
+ */
+MyMorpionXO.prototype._endingGame = function() {
+	var winner = document.createElement('div');
+	var bodyCover = document.createElement('div');
+
+	winner.classList.add('winner');
+	winner.innerHTML = this.winner ? 'O' : 'X';
+	winner.innerHTML += ' a gagné<br/>Rechargez la page pour rejouer';
+	bodyCover.classList.add('body-cover');
+	document.body.appendChild(winner);
+	document.body.appendChild(bodyCover);
+	return this;
 };
 
 /**
@@ -252,8 +294,11 @@ MyMorpionXO.prototype._bindEvents = function() {
 	var cells = board.children;
 
 	board.addEventListener('winner', function () {
-		this._refreshGame();
+		this._isThereABigWinner(board);
 	}.bind(this));
+	board.addEventListener('bigWinner', function() {
+		this._endingGame();
+	}.bind(this))
 	for (var i = 0; i < cells.length; i++) {
 		cells[i].addEventListener('click', function(e) {
 			this._handleClickOnCell(e.target);
@@ -300,5 +345,7 @@ MyMorpionXO.prototype.run = function() {
 	return this;
 };
 
+/* Test */
 var morpion = new MyMorpionXO();
 morpion.run();
+/* End Test */
