@@ -35,7 +35,7 @@ MyMorpionXO.prototype._style = function() {
 	sheet.innerHTML += '.player-turn { font-size: 1.2em; margin: auto; width: fit-content; }';
 	sheet.innerHTML += '.board { margin: 0; padding: 0;	list-style: none; display: grid; height: 24em; column-gap: 0.5em; row-gap: 0.5em; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); }';
 	sheet.innerHTML += '.board-cell { background-color: var(--grey); display: flex;	align-items: center; justify-content: center; font-size: 3.5em;	color: var(--white); transition: 300ms }';
-	sheet.innerHTML += '.winner { position: absolute; top: 50%; left: 50%; transform: translateX(-50%) translateY(-50%); background-color: #FFF; z-index: 10;	display: flex; align-items: center;	justify-content: center; text-align: center; font-size: 1.5em; padding: 2em; }';
+	sheet.innerHTML += '.popup { position: absolute; top: 50%; left: 50%; transform: translateX(-50%) translateY(-50%); background-color: #FFF; z-index: 10;	display: flex; align-items: center;	justify-content: center; text-align: center; font-size: 1.5em; padding: 2em; }';
 	sheet.innerHTML += '.body-cover { position: absolute; width: 100%; height: 100%; left: 0; right: 0; z-index: 5;	background-color: rgba(0, 0, 0, 0.5); content: ""; }';
 	document.head.appendChild(sheet);
 	return this;
@@ -335,17 +335,38 @@ MyMorpionXO.prototype._isThereABigWinner = function(board) {
  * @return {Object this}
  */
 MyMorpionXO.prototype._endingGame = function() {
-	var winner = document.createElement('div');
+	var popup = document.createElement('div');
 	var bodyCover = document.createElement('div');
 
-	winner.classList.add('winner');
-	winner.innerHTML = this.winner ? 'O' : 'X';
-	winner.innerHTML += ' a gagné<br/>Rechargez la page pour rejouer';
+	popup.classList.add('popup');
+	popup.innerHTML = this.winner ? 'O' : 'X';
+	popup.innerHTML += ' a gagné<br/>Rechargez la page pour rejouer';
 	bodyCover.classList.add('body-cover');
-	document.body.appendChild(winner);
+	document.body.appendChild(popup);
 	document.body.appendChild(bodyCover);
 	return this;
 };
+
+/**
+ * Render Draw
+ * @return {Object} this
+ */
+MyMorpionXO.prototype._renderDraw = function() {
+	var popup = document.createElement('div');
+	var bodyCover = document.createElement('div');
+
+	popup.classList.add('popup');
+	popup.innerHTML += 'Egalité';
+	bodyCover.classList.add('body-cover');
+	document.body.appendChild(popup);
+	document.body.appendChild(bodyCover);
+	setTimeout(function() {
+		document.body.removeChild(popup);
+		document.body.removeChild(bodyCover);
+		this._refreshGame();
+	}.bind(this), 1000);
+	return this;
+}
 
 /**
  * Bind Events
@@ -362,7 +383,7 @@ MyMorpionXO.prototype._bindEvents = function() {
 		this._endingGame();
 	}.bind(this));
 	board.addEventListener('draw', function() {
-		this._refreshGame();
+		this._renderDraw();
 	}.bind(this));
 	for (var i = 0; i < cells.length; i++) {
 		cells[i].addEventListener('click', function(e) {
