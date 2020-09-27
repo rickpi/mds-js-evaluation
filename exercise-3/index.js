@@ -129,7 +129,7 @@ MyMorpionXO.prototype._victoryLine = function(cell1, cell2, cell3) {
 /**
  * Check Rows
  * @param {Object[]} cells
- * @return {boolean} winner
+ * @return {Object} this
  */
 MyMorpionXO.prototype._checkRows = function(cells) {
 	if (cells[0].textContent === cells[1].textContent &&
@@ -137,7 +137,7 @@ MyMorpionXO.prototype._checkRows = function(cells) {
 		cells[0].textContent !== ' ') {
 		this.winner = cells[0].textContent === 'X' ? 0 : 1;
 		this._victoryLine(cells[0], cells[1], cells[2]);
-		return true;
+		return this;
 	}
 
 	if (cells[3].textContent === cells[4].textContent &&
@@ -145,7 +145,7 @@ MyMorpionXO.prototype._checkRows = function(cells) {
 		cells[3].textContent !== ' ') {
 		this.winner = cells[3].textContent === 'X' ? 0 : 1;
 		this._victoryLine(cells[3], cells[4], cells[5]);
-		return true;
+		return this;
 	}
 
 	if (cells[6].textContent === cells[7].textContent &&
@@ -153,16 +153,16 @@ MyMorpionXO.prototype._checkRows = function(cells) {
 		cells[6].textContent !== ' ') {
 		this.winner = cells[6].textContent === 'X' ? 0 : 1;
 		this._victoryLine(cells[6], cells[7], cells[8]);
-		return true;
+		return this;
 	}
 
-	return false;
+	return this;
 };
 
 /**
  * Check Cols
  * @param {Object[]} cells
- * @return {boolean} winner
+ * @return {Object} this
  */
 MyMorpionXO.prototype._checkCols = function(cells) {
 	if (cells[0].textContent === cells[3].textContent &&
@@ -170,7 +170,7 @@ MyMorpionXO.prototype._checkCols = function(cells) {
 		cells[0].textContent !== ' ') {
 		this.winner = cells[0].textContent === 'X' ? 0 : 1;
 		this._victoryLine(cells[0], cells[3], cells[6]);
-		return true;
+		return this;
 	}
 
 	if (cells[1].textContent === cells[4].textContent &&
@@ -178,7 +178,7 @@ MyMorpionXO.prototype._checkCols = function(cells) {
 		cells[1].textContent !== ' ') {
 		this.winner = cells[1].textContent === 'X' ? 0 : 1;
 		this._victoryLine(cells[1], cells[4], cells[7]);
-		return true;
+		return this;
 	}
 
 	if (cells[2].textContent === cells[5].textContent &&
@@ -186,16 +186,16 @@ MyMorpionXO.prototype._checkCols = function(cells) {
 		cells[2].textContent !== ' ') {
 		this.winner = cells[2].textContent === 'X' ? 0 : 1;
 		this._victoryLine(cells[2], cells[5], cells[8]);
-		return true;
+		return this;
 	}
 
-	return false;
+	return this;
 };
 
 /**
  * Check Cols
  * @param {Object[]} cells
- * @return {boolean} winner
+ * @return {Object} this
  */
 MyMorpionXO.prototype._checkDiags = function(cells) {
 	if (cells[0].textContent === cells[4].textContent &&
@@ -203,7 +203,7 @@ MyMorpionXO.prototype._checkDiags = function(cells) {
 		cells[0].textContent !== ' ') {
 		this.winner = cells[0].textContent === 'X' ? 0 : 1;
 		this._victoryLine(cells[0], cells[4], cells[8]);
-		return true;
+		return this;
 	}
 
 	if (cells[2].textContent === cells[4].textContent &&
@@ -211,10 +211,29 @@ MyMorpionXO.prototype._checkDiags = function(cells) {
 		cells[2].textContent !== ' ') {
 		this.winner = cells[2].textContent === 'X' ? 0 : 1;
 		this._victoryLine(cells[2], cells[4], cells[6]);
-		return true;
+		return this;
 	}
 
-	return false;
+	return this;
+};
+
+/**
+ * Check Draw
+ * @param {Object[]} cells
+ * @param {Object} board
+ * @return {Object} this
+ */
+MyMorpionXO.prototype._checkDraw = function(cells, board) {
+	var draw = document.createEvent('Event');
+
+	draw.initEvent('draw', true, true);
+	for (var i = 0; i < cells.length; i++) {
+		if (cells[i].textContent === ' ') {
+			return this;
+		}
+	}
+	board.dispatchEvent(draw);
+	return this;
 };
 
 /**
@@ -226,10 +245,10 @@ MyMorpionXO.prototype._isThereAWinner = function() {
 	var cells = board.children;
 	var winner = false;
 
-	winner = this._checkRows(cells);
-	winner = winner ? true : this._checkCols(cells);
-	winner = winner ? true : this._checkDiags(cells);
-	return winner;
+	this._checkRows(cells);
+	this.winner !== -1 ? this.winner : this._checkCols(cells);
+	this.winner !== -1 ? this.winner : this._checkDiags(cells);
+	this.winner !== -1 ? this.winner : this._checkDraw(cells, board);
 };
 
 /**
@@ -255,7 +274,8 @@ MyMorpionXO.prototype._handleClickOnCell = function(cell) {
 	winnerEvent.initEvent('winner', true, true);
 	if (cell.textContent === ' ') {
 		cell.textContent = this.whosPlaying ? 'O' : 'X';
-		if (this._isThereAWinner()) {
+		this._isThereAWinner();
+		if (this.winner !== -1) {
 			this.winner ? this.scoreO++ : this.scoreX++;
 			board.dispatchEvent(winnerEvent);
 			return ;
@@ -282,6 +302,7 @@ MyMorpionXO.prototype._refreshGame = function() {
 	scoreO.textContent = this.scoreO;
 	scoreX.textContent = this.scoreX;
 	playerTurn.textContent = this.whosPlaying ? 'O' : 'X';
+	this.winner = -1;
 	for (var i = 0; i < cells.length; i++) {
 		cells[i].textContent = ' ';
 	}
@@ -296,6 +317,9 @@ MyMorpionXO.prototype._refreshGame = function() {
 MyMorpionXO.prototype._isThereABigWinner = function(board) {
 	var bigWinnerEvent = document.createEvent('Event');
 
+	setTimeout(function () {
+		this._refreshGame();
+	}.bind(this), 1000);
 	bigWinnerEvent.initEvent('bigWinner', true, true);
 	if (this.scoreX === 3 || this.scoreO === 3) {
 		board.dispatchEvent(bigWinnerEvent);
@@ -303,9 +327,6 @@ MyMorpionXO.prototype._isThereABigWinner = function(board) {
 		return this;
 	}
 
-	setTimeout(function () {
-		this._refreshGame();
-	}.bind(this), 1000);
 	return this;
 };
 
@@ -339,7 +360,10 @@ MyMorpionXO.prototype._bindEvents = function() {
 	}.bind(this));
 	board.addEventListener('bigWinner', function() {
 		this._endingGame();
-	}.bind(this))
+	}.bind(this));
+	board.addEventListener('draw', function() {
+		this._refreshGame();
+	}.bind(this));
 	for (var i = 0; i < cells.length; i++) {
 		cells[i].addEventListener('click', function(e) {
 			this._handleClickOnCell(e.target);
