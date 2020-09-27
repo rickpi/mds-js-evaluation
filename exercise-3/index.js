@@ -25,7 +25,7 @@ MyMorpionXO.prototype._style = function() {
 	fontFamily.href = 'https://fonts.googleapis.com/css2?family=Roboto:wght@300;500;700&display=swap';
 	fontFamily.rel = 'stylesheet';
 	document.head.appendChild(fontFamily);
-	sheet.innerHTML = ':root { --primary-color: #9FD17A; --primary-color-light: #C7FE9F; --primary-color-dark: #8AD058; --white: #FFF; --grey: #BBB; }';
+	sheet.innerHTML = ':root { --primary-color: #9FD17A; --primary-color-light: #C7FE9F; --primary-color-dark: #8AD058; --white: #FFF; --grey: #BBB; --red: #b71540 }';
 	sheet.innerHTML += 'html, body { padding: 0; margin: 0; box-sizing: border-box; font-size: 16px; font-family: \'Roboto\', sans-serif; }';
 	sheet.innerHTML += 'body { min-width: 100vw; min-height: 100vh; background-image: linear-gradient(90deg, var(--primary-color-light), var(--primary-color-dark)); display: flex; flex-direction: column; position: relative }';
 	sheet.innerHTML += '.container { margin: auto; padding: 1em; box-shadow: 0 0.8em 1em rgba(0, 0, 0, 0.65); background-color: var(--white); border-radius: 0.6em; }';
@@ -34,7 +34,7 @@ MyMorpionXO.prototype._style = function() {
 	sheet.innerHTML += '.players-score > span {	color: var(--primary-color); }';
 	sheet.innerHTML += '.player-turn { font-size: 1.2em; margin: auto; width: fit-content; }';
 	sheet.innerHTML += '.board { margin: 0; padding: 0;	list-style: none; display: grid; height: 24em; column-gap: 0.5em; row-gap: 0.5em; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); }';
-	sheet.innerHTML += '.board-cell { background-color: var(--grey); display: flex;	align-items: center; justify-content: center; font-size: 3.5em;	color: var(--white); }';
+	sheet.innerHTML += '.board-cell { background-color: var(--grey); display: flex;	align-items: center; justify-content: center; font-size: 3.5em;	color: var(--white); transition: 300ms }';
 	sheet.innerHTML += '.winner { position: absolute; top: 50%; left: 50%; transform: translateX(-50%) translateY(-50%); background-color: #FFF; z-index: 10;	display: flex; align-items: center;	justify-content: center; text-align: center; font-size: 1.5em; padding: 2em; }';
 	sheet.innerHTML += '.body-cover { position: absolute; width: 100%; height: 100%; left: 0; right: 0; z-index: 5;	background-color: rgba(0, 0, 0, 0.5); content: ""; }';
 	document.head.appendChild(sheet);
@@ -96,6 +96,37 @@ MyMorpionXO.prototype._createComponents = function() {
 };
 
 /**
+ * Highlight Cell
+ * @param {Object} cell
+ * @return {Object} this
+ */
+MyMorpionXO.prototype._highlightCell = function(cell) {
+	cell.style.color = 'var(--red)';
+	setTimeout(function() {
+		cell.style.color = 'var(--white)';
+	}, 1000);
+
+	return this;
+};
+
+/**
+ * Victory Line
+ * @param {Object} cell1
+ * @param {Object} cell2
+ * @param {Object} cell3
+ * @return {Object} this
+ */
+MyMorpionXO.prototype._victoryLine = function(cell1, cell2, cell3) {
+	var highlight = document.createEvent('Event');
+
+	highlight.initEvent('highlight', true, true);
+	cell1.dispatchEvent(highlight);
+	cell2.dispatchEvent(highlight);
+	cell3.dispatchEvent(highlight);
+	return this;
+};
+
+/**
  * Check Rows
  * @param {Object[]} cells
  * @return {boolean} winner
@@ -105,6 +136,7 @@ MyMorpionXO.prototype._checkRows = function(cells) {
 		cells[0].textContent === cells[2].textContent &&
 		cells[0].textContent !== ' ') {
 		this.winner = cells[0].textContent === 'X' ? 0 : 1;
+		this._victoryLine(cells[0], cells[1], cells[2]);
 		return true;
 	}
 
@@ -112,6 +144,7 @@ MyMorpionXO.prototype._checkRows = function(cells) {
 		cells[3].textContent === cells[5].textContent &&
 		cells[3].textContent !== ' ') {
 		this.winner = cells[3].textContent === 'X' ? 0 : 1;
+		this._victoryLine(cells[3], cells[4], cells[5]);
 		return true;
 	}
 
@@ -119,6 +152,7 @@ MyMorpionXO.prototype._checkRows = function(cells) {
 		cells[6].textContent === cells[8].textContent &&
 		cells[6].textContent !== ' ') {
 		this.winner = cells[6].textContent === 'X' ? 0 : 1;
+		this._victoryLine(cells[6], cells[7], cells[8]);
 		return true;
 	}
 
@@ -135,6 +169,7 @@ MyMorpionXO.prototype._checkCols = function(cells) {
 		cells[0].textContent === cells[6].textContent &&
 		cells[0].textContent !== ' ') {
 		this.winner = cells[0].textContent === 'X' ? 0 : 1;
+		this._victoryLine(cells[0], cells[3], cells[6]);
 		return true;
 	}
 
@@ -142,6 +177,7 @@ MyMorpionXO.prototype._checkCols = function(cells) {
 		cells[1].textContent === cells[7].textContent &&
 		cells[1].textContent !== ' ') {
 		this.winner = cells[1].textContent === 'X' ? 0 : 1;
+		this._victoryLine(cells[1], cells[4], cells[7]);
 		return true;
 	}
 
@@ -149,6 +185,7 @@ MyMorpionXO.prototype._checkCols = function(cells) {
 		cells[2].textContent === cells[8].textContent &&
 		cells[2].textContent !== ' ') {
 		this.winner = cells[2].textContent === 'X' ? 0 : 1;
+		this._victoryLine(cells[2], cells[5], cells[8]);
 		return true;
 	}
 
@@ -165,6 +202,7 @@ MyMorpionXO.prototype._checkDiags = function(cells) {
 		cells[0].textContent === cells[8].textContent &&
 		cells[0].textContent !== ' ') {
 		this.winner = cells[0].textContent === 'X' ? 0 : 1;
+		this._victoryLine(cells[0], cells[4], cells[8]);
 		return true;
 	}
 
@@ -172,6 +210,7 @@ MyMorpionXO.prototype._checkDiags = function(cells) {
 		cells[2].textContent === cells[6].textContent &&
 		cells[2].textContent !== ' ') {
 		this.winner = cells[2].textContent === 'X' ? 0 : 1;
+		this._victoryLine(cells[2], cells[4], cells[6]);
 		return true;
 	}
 
@@ -189,7 +228,7 @@ MyMorpionXO.prototype._isThereAWinner = function() {
 
 	winner = this._checkRows(cells);
 	winner = winner ? true : this._checkCols(cells);
-	winner = winner ? true :this._checkDiags(cells);
+	winner = winner ? true : this._checkDiags(cells);
 	return winner;
 };
 
@@ -264,7 +303,9 @@ MyMorpionXO.prototype._isThereABigWinner = function(board) {
 		return this;
 	}
 
-	this._refreshGame();
+	setTimeout(function () {
+		this._refreshGame();
+	}.bind(this), 1000);
 	return this;
 };
 
@@ -302,6 +343,9 @@ MyMorpionXO.prototype._bindEvents = function() {
 	for (var i = 0; i < cells.length; i++) {
 		cells[i].addEventListener('click', function(e) {
 			this._handleClickOnCell(e.target);
+		}.bind(this));
+		cells[i].addEventListener('highlight', function(e) {
+			this._highlightCell(e.target);
 		}.bind(this));
 	}
 
