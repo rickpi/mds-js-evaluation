@@ -16,5 +16,11 @@ var WorldMap = function WorldMap() {
  * @return {Object} this
  */
 WorldMap.prototype.renderWorldMap = function() {
+	console.log(svg);
 	return this;
 };
+
+/* Test */
+var worldMap = new WorldMap();
+worldMap.renderWorldMap();
+/* End test */
