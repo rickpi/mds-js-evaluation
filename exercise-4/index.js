@@ -79,7 +79,14 @@ WorldMap.prototype._hoverCountry = function(country, color) {
  * @return {Object} this
  */
 WorldMap.prototype._clickCountry = function(country) {
+	console.log(country.id);
+	var selected = this.map.querySelector('#' + this.selected);
+
 	if (country.id !== this.selected) {
+		if (selected) {
+			selected.style.fill = '#000';
+		}
+
 		this.selected = country.id;
 		country.style.fill = '#F00';
 		return this;
@@ -94,7 +101,7 @@ WorldMap.prototype._clickCountry = function(country) {
  * Update Caption
  * @return {Object} this
  */
- WorldMap.prototype._updateCaption = function() {
+ orldMap.prototype._updateCaption = function() {
  	var caption = document.querySelector('.caption');
  	var captionList = document.createElement('ul');
  	var listItem = document.createElement('li');
@@ -103,14 +110,32 @@ WorldMap.prototype._clickCountry = function(country) {
  	if (this.selected) {
  		var country = this.map.querySelector('#' + this.selected);
  		var countryName = country.id;
+
+ 		listItem.textContent = this._formatCountryName(countryName);/*
  		var firstLetter = countryName.charAt(0).toUpperCase();
 
  		countryName = firstLetter + countryName.slice(1);
- 		listItem.textContent = countryName;
+ 		listItem.textContent = countryName;*/
  		captionList.appendChild(listItem);
  		caption.appendChild(captionList);
  	}
- };
+};
+
+/**
+ * Format Country Name
+ * @param {string} country
+ * @return {string} countryName
+ */
+WorldMap.prototype._formatCountryName = function(country) {
+ 	var countryTab = country.split('-');
+ 	var countryTabUppered = countryTab.map(function(item) {
+ 		var firstLetter = item.charAt(0).toUpperCase();
+
+ 		return firstLetter + item.slice(1);
+ 	});
+
+ 	return countryTabUppered.join(' ');
+}
 
 /* Test */
 var worldMap = new WorldMap();
