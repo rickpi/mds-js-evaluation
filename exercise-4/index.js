@@ -101,7 +101,7 @@ WorldMap.prototype._clickCountry = function(country) {
  * Update Caption
  * @return {Object} this
  */
- orldMap.prototype._updateCaption = function() {
+ WorldMap.prototype._updateCaption = function() {
  	var caption = document.querySelector('.caption');
  	var captionList = document.createElement('ul');
  	var listItem = document.createElement('li');
