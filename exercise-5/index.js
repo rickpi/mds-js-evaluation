@@ -27,61 +27,101 @@ Form.prototype.run = function() {
 Form.prototype._bindEvents = function() {
 	this.inputs.forEach(function(input) {
 		input.addEventListener('focus', function(event) {
-			var parentNode = event.target.parentNode;
-			var placeholder = parentNode.querySelector('.input-placeholder');
-
-			event.target.classList.remove('error');
-			event.target.placeholder = '';
-			placeholder.style.opacity = '1';
-			placeholder.style.visibility = 'visible';
+			this._handleFocus(event.target);
 		}.bind(this));
 		input.addEventListener('blur', function(event) {
-			var parentNode = event.target.parentNode;
-			var placeholder = parentNode.querySelector('.input-placeholder');
-			var error = parentNode.querySelector('.input-error');
-
-			error.textContent = '';
-			if (!event.target.value) {
-				event.target.placeholder = placeholder.textContent;
-				event.target.classList.add('error');
-				placeholder.style.opacity = '0';
-				placeholder.style.visibility = 'hidden';
-				error.textContent = "Ce champ est requis";
-			}
-
+			this._handleBlur(event.target);
 		}.bind(this));
 		input.addEventListener('input', function(event) {
-			var parentNode = event.target.parentNode;
-			var placeholder = parentNode.querySelector('.input-placeholder');
-
-			if (event.target.value) {
-				placeholder.style.fontSize = '0.7em';
-				placeholder.style.transform = 'translateY(0)';
-			}
-
-			if (!event.target.value) {
-				placeholder.style.fontSize = '1em';
-				placeholder.style.transform = 'translateY(-185%)';
-			}
-
+			this._handleInput(event.target);
 		}.bind(this));
-	});
-	this.form.addEventListener('submit', function(event) {
-		event.preventDefault();
-		this.isValid = true;
-		this.inputs.forEach(function(input) {
-			var parentNode = input.parentNode;
-
-			parentNode.querySelector('.input-error').textContent = '';
-		}.bind(this));
-		this._checkEmptyFields();
-		this._checkInputsValue();
-
-		if (this.isValid) {
-			event.target.submit();
-		}
-
 	}.bind(this));
+	this.form.addEventListener('submit', function(event) {
+		this._handleSubmit(event);
+	}.bind(this));
+	return this;
+};
+
+/**
+ * Handle Focus
+ * @param {Object} input
+ * @return {Object} this
+ */
+Form.prototype._handleFocus = function(input) {
+	var parentNode = input.parentNode;
+	var placeholder = parentNode.querySelector('.input-placeholder');
+
+	input.classList.remove('error');
+	input.placeholder = '';
+	placeholder.style.opacity = '1';
+	placeholder.style.visibility = 'visible';
+	return this;
+};
+
+/**
+ * Handle Blur
+ * @param {Object} input
+ * @return {Object} this
+ */
+Form.prototype._handleBlur = function(input) {
+	var parentNode = input.parentNode;
+	var placeholder = parentNode.querySelector('.input-placeholder');
+	var error = parentNode.querySelector('.input-error');
+
+	error.textContent = '';
+	if (!event.target.value) {
+		input.placeholder = placeholder.textContent;
+		input.classList.add('error');
+		placeholder.style.opacity = '0';
+		placeholder.style.visibility = 'hidden';
+		error.textContent = "Ce champ est requis";
+	}
+
+	return this;
+};
+
+/**
+ * Handle Input
+ * @param {Object} input
+ * @return {Object} this
+ */
+Form.prototype._handleInput = function(input) {
+	var parentNode = input.parentNode;
+	var placeholder = parentNode.querySelector('.input-placeholder');
+
+	if (input.value) {
+		placeholder.style.fontSize = '0.7em';
+		placeholder.style.transform = 'translateY(0)';
+	}
+
+	if (!input.value) {
+		placeholder.style.fontSize = '1em';
+		placeholder.style.transform = 'translateY(-185%)';
+	}
+
+	return this;
+};
+
+/**
+ * Handle Submit
+ * @param {Object} event
+ * @return {Object} this
+ */
+Form.prototype._handleSubmit = function(event) {
+	event.preventDefault();
+	this.isValid = true;
+	this.inputs.forEach(function(input) {
+		var parentNode = input.parentNode;
+
+		parentNode.querySelector('.input-error').textContent = '';
+	}.bind(this));
+	this._checkEmptyFields();
+	this._checkInputsValue();
+
+	if (this.isValid) {
+		event.target.submit();
+	}
+
 	return this;
 };
 
