@@ -30,7 +30,7 @@ Form.prototype._bindEvents = function() {
 			var parentNode = event.target.parentNode;
 			var placeholder = parentNode.querySelector('.input-placeholder');
 
-			event.target.classList.add('error');
+			event.target.classList.remove('error');
 			event.target.placeholder = '';
 			placeholder.style.opacity = '1';
 			placeholder.style.visibility = 'visible';
@@ -68,7 +68,14 @@ Form.prototype._bindEvents = function() {
 	});
 	this.form.addEventListener('submit', function(event) {
 		event.preventDefault();
+		this.isValid = true;
+		this.inputs.forEach(function(input) {
+			var parentNode = input.parentNode;
+
+			parentNode.querySelector('.input-error').textContent = '';
+		}.bind(this));
 		this._checkEmptyFields();
+		this._checkInputsValue();
 
 		if (this.isValid) {
 			event.target.submit();
@@ -93,6 +100,83 @@ Form.prototype._checkEmptyFields = function() {
 		}
 
 	}.bind(this));
+	return this;
+};
+
+/**
+ * Check Empty Fields
+ * @return {Object} this
+ */
+Form.prototype._checkInputsValue = function() {
+	this.inputs.forEach(function(input) {
+		switch (input.type) {
+			case 'text':
+			this._checkInputText(input);
+			break;
+			case 'password':
+			this._checkInputPassword(input);
+			break;
+		}
+	}.bind(this));
+	return this;
+};
+
+/**
+ * Check Input Text
+ * @param {Object} input
+ * @return {Object} this
+ */
+Form.prototype._checkInputText = function(input) {
+	var search = input.value.search(/[^a-z\-À-ÿ ]/gi);
+	var parentNode = input.parentNode;
+
+	if (input.name === 'email') {
+		return this._checkInputEmail(input);
+	}
+
+	if (search >= 0) {
+		this.isValid = false;
+		parentNode.querySelector('.input-error').textContent = 'Champ invalide';
+		input.classList.add('error');
+	}
+
+	return this;
+};
+
+/**
+ * Check Input Email
+ * @param {Object} input
+ * @return {Object} this
+ */
+Form.prototype._checkInputEmail = function(input) {
+	var search = input.value.search(/^\S+@\S+\.\S+$/gi);
+	var parentNode = input.parentNode;
+
+	if (search < 0) {
+		this.isValid = false;
+		parentNode.querySelector('.input-error').textContent = 'Email invalide';
+		input.classList.add('error');
+	}
+
+	return this;
+};
+
+/**
+ * Check Input Password
+ * @param {Object} input
+ * @return {Object} this
+ */
+Form.prototype._checkInputPassword = function(input) {
+	var search = input.value.search(/[ ]/gi);
+	console.log(search);
+	var parentNode = input.parentNode;
+
+	if (search >= 0) {
+		this.isValid = false;
+		parentNode.querySelector('.input-error').textContent = 'Password invalide';
+		input.classList.add('error');
+	}
+
 	return this;
 };
 
