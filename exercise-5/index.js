@@ -91,14 +91,9 @@ Form.prototype._bindEvents = function() {
  */
 Form.prototype._checkEmptyFields = function() {
 	this.inputs.forEach(function(input) {
-		var parentNode = input.parentNode;
-
 		if (!input.value) {
-			this.isValid = false;
-			parentNode.querySelector('.input-error').textContent = 'Ce champ est requis';
-			input.classList.add('error');
+			this._handleError(input, 'Ce champ est requis');
 		}
-
 	}.bind(this));
 	return this;
 };
@@ -128,16 +123,13 @@ Form.prototype._checkInputsValue = function() {
  */
 Form.prototype._checkInputText = function(input) {
 	var search = input.value.search(/[^a-z\-À-ÿ ]/gi);
-	var parentNode = input.parentNode;
 
 	if (input.name === 'email') {
 		return this._checkInputEmail(input);
 	}
 
 	if (search >= 0) {
-		this.isValid = false;
-		parentNode.querySelector('.input-error').textContent = 'Champ invalide';
-		input.classList.add('error');
+		this._handleError(input, 'Champ invalide');
 	}
 
 	return this;
@@ -150,12 +142,9 @@ Form.prototype._checkInputText = function(input) {
  */
 Form.prototype._checkInputEmail = function(input) {
 	var search = input.value.search(/^\S+@\S+\.\S+$/gi);
-	var parentNode = input.parentNode;
 
 	if (search < 0) {
-		this.isValid = false;
-		parentNode.querySelector('.input-error').textContent = 'Email invalide';
-		input.classList.add('error');
+		this._handleError(input, 'Email invalide');
 	}
 
 	return this;
@@ -168,15 +157,26 @@ Form.prototype._checkInputEmail = function(input) {
  */
 Form.prototype._checkInputPassword = function(input) {
 	var search = input.value.search(/[ ]/gi);
-	console.log(search);
-	var parentNode = input.parentNode;
 
 	if (search >= 0) {
-		this.isValid = false;
-		parentNode.querySelector('.input-error').textContent = 'Password invalide';
-		input.classList.add('error');
+		this._handleError(input, 'Password invalide');
 	}
 
+	return this;
+};
+
+/**
+ * Handle Error
+ * @param {Object} input
+ * @param {String} message
+ * @return {Object} this
+ */
+Form.prototype._handleError = function(input, message) {
+	var parentNode = input.parentNode;
+
+	this.isValid = false;
+	parentNode.querySelector('.input-error').textContent = message;
+	input.classList.add('error');
 	return this;
 };
 
