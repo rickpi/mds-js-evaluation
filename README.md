@@ -36,3 +36,13 @@ Hoverring a country will be change its color
 
 ### Click
 Clicking on a country will be change its color and display its name on the bottom of the map
+
+## Form Validator
+### App
+A simple form with name, firstname, mail address and password
+
+### Validator
+Each fields will be checked when the form is submitted
+
+### Regexp
+The validator uses regexp to check the good value of the fields
