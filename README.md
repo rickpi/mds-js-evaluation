@@ -53,3 +53,7 @@ A simple function returning true if the given number is valid, false if it's not
 
 ### Regexp
 The validator uses regexp to check the good value.
+
+## Compute Notes
+### Function
+A simple function taking array of notes (as integer) and computing the average of theses notes.
