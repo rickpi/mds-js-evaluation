@@ -26,3 +26,13 @@ When there is a draw, it advise players about that
 
 ### Victory
 When one player gets 3 points, it wins the game
+
+## World Map
+### App
+A simple world map displaying name of countries
+
+### Hover
+Hoverring a country will be change its color
+
+### Click
+Clicking on a country will be change its color and display its name on the bottom of the map
